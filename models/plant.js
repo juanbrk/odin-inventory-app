@@ -6,10 +6,11 @@ var PlantSchema = new Schema(
   {
     name: {type: String, required: true, maxlength: 100},
     stock:{type: Number, min:0},
+    price:{type: Number, min: [0, 'price must be a positive number']},
     family_name: {type: String, maxlength: 100},
     date_of_sow: {type: Date},
-    type: {type: String, maxlength:100},
     status: {type: String, required: true, enum: ['Available', 'Sold out', 'Coming soon','Unavailable'], default: 'Available'},
+    plant_type: {type: Schema.Types.ObjectId, ref: 'PlantType', required:true}
   }
 );
 
