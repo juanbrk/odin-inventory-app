@@ -8,6 +8,7 @@
     "serverstart": "DEBUG=express-locallibrary-tutorial:* npm run devstart"
   },
   "dependencies": {
+    "async": "^3.2.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
@@ -17,6 +18,7 @@
     "pug": "2.0.0-beta11"
   },
   "devDependencies": {
+    "faker": "^5.1.0",
     "nodemon": "^2.0.6"
   }
 }

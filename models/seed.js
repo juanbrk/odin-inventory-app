@@ -4,8 +4,7 @@ var Schema = mongoose.Schema;
 
 var SeedSchema = new Schema(
   {
-    name: {type: String, required: true},
-    summary: {type: String},
+    description: {type: String},
     brand: {type: Schema.Types.ObjectId, ref: 'Brand', required: true},
     plant: {type: Schema.Types.ObjectId, ref: 'PlantType', required: true},
     price: {type: Number, min:[0, 'Price must be a positive number']},
@@ -13,6 +12,12 @@ var SeedSchema = new Schema(
   }
 );
 
+// Virtual for Seed's name
+SeedSchema
+.virtual('name')
+.get(function () {
+  return  this.plant.name + ' seeds';
+});
 // Virtual for Seed's URL
 SeedSchema
 .virtual('url')
