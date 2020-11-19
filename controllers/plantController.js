@@ -1,7 +1,29 @@
 var Plant = require('../models/plant');
+var Seed = require('../models/seed');
+var Item = require('../models/item');
+var PlantType = require('../models/plant_type');
 
-exports.index = function(req, res) {
-    res.send('NOT IMPLEMENTED: Site Home Page');
+var async = require('async');
+
+exports.index = function(req, res) {   
+    
+    async.parallel({
+        plant_count: function(callback){
+            Plant.countDocuments({}, callback);
+        },
+        plant_type_count: function(callback) {
+            PlantType.countDocuments({}, callback);
+        },
+        seed_count: function(callback) {
+            Seed.countDocuments({}, callback);
+        },
+        item_count: function(callback) {
+            Item.countDocuments({}, callback);
+        }
+
+    }, function(err, results) {
+        res.render('index', { title: 'Plant inventory Home', error: err, data: results });
+    });
 };
 
 // Display list of all Plants.
