@@ -2,7 +2,12 @@ var PlantType = require('../models/plant_type');
 
 // Display list of all PlantTypes.
 exports.plant_type_list = function(req, res) {
-    res.send('NOT IMPLEMENTED: PlantType list');
+    PlantType.find({}, 'name description')
+    .exec(function(err, types){
+        if(err){ return next(err); }
+        //successful, so render
+        res.render('types_list', {title : 'PlantTypes List', types_list : types});
+    });
 };
 
 // Display detail page for a specific PlantType.
