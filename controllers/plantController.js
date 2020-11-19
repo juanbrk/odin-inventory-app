@@ -1,6 +1,6 @@
 var Plant = require('../models/plant');
 var Seed = require('../models/seed');
-var Item = require('../models/item');
+var Plant = require('../models/item');
 var PlantType = require('../models/plant_type');
 
 var async = require('async');
@@ -18,7 +18,7 @@ exports.index = function(req, res) {
             Seed.countDocuments({}, callback);
         },
         item_count: function(callback) {
-            Item.countDocuments({}, callback);
+            Plant.countDocuments({}, callback);
         }
 
     }, function(err, results) {
@@ -28,7 +28,13 @@ exports.index = function(req, res) {
 
 // Display list of all Plants.
 exports.plant_list = function(req, res) {
-    res.send('NOT IMPLEMENTED: Plant list');
+    Plant.find({}, 'name plant_type price status')
+    .exec(function (err, plants) {
+      if (err) { return next(err); }
+      //Successful, so render
+      console.log(`PLANTS %p`, plants);
+      res.render('plant_list', { title: 'Plant List', plant_list: plants });
+    });
 };
 
 // Display detail page for a specific Plant.
