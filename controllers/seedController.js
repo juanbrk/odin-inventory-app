@@ -2,7 +2,14 @@ var Seed = require('../models/seed');
 
 // Display list of all Seeds.
 exports.seed_list = function(req, res) {
-    res.send('NOT IMPLEMENTED: Seed list');
+    Seed.find({}, 'name brand ')
+    .populate('plant')
+    .exec(function (err, seeds) {
+      if (err) { return next(err); }
+      //Successful, so render
+      console.log(`SEEDS %r`, seeds);
+      res.render('seed_list', { title: 'Seed List', seed_list: seeds });
+    });
 };
 
 // Display detail page for a specific Seed.
