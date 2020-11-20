@@ -6,7 +6,8 @@ block content
   ul
     each seed in seed_list
       li 
-        a(href=seed.url) #{seed.name} : #{seed.brand}  
+        a(href=seed.url) #{seed.name} : 
+        | (#{seed.brand.name})  
 
     else
       li There are no seeds.

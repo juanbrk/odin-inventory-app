@@ -2,7 +2,8 @@ var Seed = require('../models/seed');
 
 // Display list of all Seeds.
 exports.seed_list = function(req, res) {
-    Seed.find({}, 'name brand ')
+    Seed.find({}, 'name brand plant')
+    .populate('brand')
     .populate('plant')
     .exec(function (err, seeds) {
       if (err) { return next(err); }
