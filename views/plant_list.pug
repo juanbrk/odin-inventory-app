@@ -1,0 +1,22 @@
+extends layout
+
+block content
+  h1= title
+
+  ul
+    each plant in plant_list
+      li 
+        a(href=plant.url) #{plant.name} : #{plant.plant_type} - 
+        if plant.status=='Available'
+          span.text-success #{plant.status}
+        else if plant.status=='Sold out'
+          span.text-danger #{plant.status}
+        else if plant.status=='Coming soon'
+          span.text-info #{plant.status}
+        else
+          span.text-warning #{plant.status} 
+        if plant.status=='Available'
+          span  (Price: $#{plant.price} )
+
+    else
+      li There are no plants.

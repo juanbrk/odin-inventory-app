@@ -2,4 +2,17 @@ extends layout
 
 block content
   h1= title
-  p Welcome to #{title}
+  p Welcome to #[em Plant inventory management app], a very basic Express website to control plant and items inventory.
+
+  h1 Dynamic content
+
+  if error
+    p Error getting dynamic content.
+  else
+    p The nursery has the following record counts:
+
+    ul
+      li #[strong Plants:] !{data.plant_count}
+      li #[strong Items:] !{data.item_count}
+      li #[strong Plant Types:] !{data.plant_type_count}
+      li #[strong Seeds:] !{data.seed_count}

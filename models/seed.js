@@ -6,7 +6,7 @@ var SeedSchema = new Schema(
   {
     description: {type: String},
     brand: {type: Schema.Types.ObjectId, ref: 'Brand', required: true},
-    plant: {type: Schema.Types.ObjectId, ref: 'PlantType', required: true},
+    plant: {type: Schema.Types.ObjectId, ref: 'Plant', required: true},
     price: {type: Number, min:[0, 'Price must be a positive number']},
     expiration_date: {type: Date}
   }

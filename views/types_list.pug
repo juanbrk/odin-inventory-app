@@ -1,0 +1,14 @@
+extends layout
+
+block content
+  h1= title
+  
+  ul
+    - types_list.sort(function(a, b) {let textA = a.name.toUpperCase(); let textB = b.name.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
+    each plant_type in types_list
+      li 
+        a(href=plant_type.url) #{plant_type.name} 
+        | - (#{plant_type.description})
+
+    else
+      li There are no plant types.

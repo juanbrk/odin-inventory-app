@@ -1,8 +1,21 @@
 var Seed = require('../models/seed');
+var Plant = require('../models/plant');
+var Brand = require('../models/brand');
+
+const async = require('async');
+const { body,validationResult } = require('express-validator');
 
 // Display list of all Seeds.
 exports.seed_list = function(req, res) {
-    res.send('NOT IMPLEMENTED: Seed list');
+    Seed.find({}, 'name brand plant')
+    .populate('brand')
+    .populate('plant')
+    .exec(function (err, seeds) {
+      if (err) { return next(err); }
+      //Successful, so render
+      console.log(`SEEDS %r`, seeds);
+      res.render('seed_list', { title: 'Seed List', seed_list: seeds });
+    });
 };
 
 // Display detail page for a specific Seed.
@@ -12,13 +25,71 @@ exports.seed_detail = function(req, res) {
 
 // Display Seed create form on GET.
 exports.seed_create_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Seed create GET');
+    // Get all plants and brands, which we can use for adding to our seed.
+    async.parallel({
+        plants: function(callback) {
+            Plant.find({}, 'name', callback);
+        },
+        brands: function(callback) {
+            Brand.find(callback);
+        },
+    }, function(err, results) {
+        if (err) { return next(err); }
+        console.log(`RESULTS %r`, results);
+        res.render('seed_form', { title: 'New Seed', plants: results.plants, brands: results.brands });
+    });
 };
 
 // Handle Seed create on POST.
-exports.seed_create_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Seed create POST');
-};
+exports.seed_create_post = [
+    // Validate and sanitise fields.
+    body('plant', 'select plant').trim().isLength({ min: 1 }).escape(),
+    body('brand', 'select brand').trim().isLength({ min: 1 }).escape(),
+    body('description', ).optional().trim().escape(),
+    body('price').isCurrency().optional().escape(),
+    body('exp_date', 'Invalid date').optional({ checkFalsy: true }).isISO8601().toDate(),
+    
+    // Process request after validation and sanitization.
+    (req, res, next) => {
+
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // Create a Seed object with escaped and trimmed data.
+        var seedInstance = new Seed(
+          { plant: req.body.plant,
+            brand: req.body.brand,
+            description: req.body.description,
+            expiration_date: req.body.exp_date,
+            price: req.body.price 
+           });
+
+        if (!errors.isEmpty()) {
+            // There are errors. Render form again with sanitized values and error messages.
+            async.parallel({
+                plants: function(callback) {
+                    Plant.find({}, 'name', callback);
+                },
+                brands: function(callback) {
+                    Brand.find(callback);
+                }
+            }, function (err, results) {
+                    if (err) { return next(err); }
+                    // Successful, so render.
+                    res.render('seed_form', { title: 'New Seed', plants: results.plants, brands: results.brands, errors: errors.array() });
+            });
+            return;
+        }
+        else {
+            // Data from form is valid.
+            seedInstance.save(function (err) {
+                if (err) { return next(err); }
+                   // Successful - redirect to new record.
+                   res.redirect(seedInstance.url);
+                });
+        }
+    }
+];
 
 // Display Seed delete form on GET.
 exports.seed_delete_get = function(req, res) {

@@ -1,12 +1,40 @@
 var Plant = require('../models/plant');
+var Seed = require('../models/seed');
+var Plant = require('../models/item');
+var PlantType = require('../models/plant_type');
 
-exports.index = function(req, res) {
-    res.send('NOT IMPLEMENTED: Site Home Page');
+var async = require('async');
+
+exports.index = function(req, res) {   
+    
+    async.parallel({
+        plant_count: function(callback){
+            Plant.countDocuments({}, callback);
+        },
+        plant_type_count: function(callback) {
+            PlantType.countDocuments({}, callback);
+        },
+        seed_count: function(callback) {
+            Seed.countDocuments({}, callback);
+        },
+        item_count: function(callback) {
+            Plant.countDocuments({}, callback);
+        }
+
+    }, function(err, results) {
+        res.render('index', { title: 'Plant inventory Home', error: err, data: results });
+    });
 };
 
 // Display list of all Plants.
 exports.plant_list = function(req, res) {
-    res.send('NOT IMPLEMENTED: Plant list');
+    Plant.find({}, 'name plant_type price status')
+    .exec(function (err, plants) {
+      if (err) { return next(err); }
+      //Successful, so render
+      console.log(`PLANTS %p`, plants);
+      res.render('plant_list', { title: 'Plant List', plant_list: plants });
+    });
 };
 
 // Display detail page for a specific Plant.
