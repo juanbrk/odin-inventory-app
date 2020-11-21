@@ -1,4 +1,9 @@
 var Brand = require('../models/brand');
+var Item = require('../models/item');
+var Seed = require('../models/seed');
+
+var async = require('async');
+
 
 // Display list of all Brands.
 exports.brand_list = function(req, res) {
@@ -11,8 +16,33 @@ exports.brand_list = function(req, res) {
 };
 
 // Display detail page for a specific Brand.
-exports.brand_detail = function(req, res) {
-    res.send('NOT IMPLEMENTED: Brand detail: ' + req.params.id);
+exports.brand_detail = function(req, res, next) {
+    async.parallel({
+        brand: function(callback) {
+            Brand.findById(req.params.id)
+              .exec(callback);
+        },
+
+        brand_items: function(callback) {
+            Item.find({ 'brand': req.params.id })
+              .exec(callback);
+        },
+        brand_seeds: function(callback) {
+            Seed.find({ 'brand': req.params.id }, 'name brand plant description')
+                .populate('plant', 'name')
+                .exec(callback);
+        }
+
+    }, function(err, results) {
+        if (err) { return next(err); }
+        if (results.brand==null) { // No results.
+            var err = new Error('Brand not found');
+            err.status = 404;
+            return next(err);
+        }
+        // Successful, so render
+        res.render('brand_detail', { title: 'Brand Detail', brand: results.brand, brand_items: results.brand_items, brand_seeds: results.brand_seeds } );
+    });
 };
 
 // Display Brand create form on GET.
