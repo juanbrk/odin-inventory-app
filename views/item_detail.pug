@@ -1,0 +1,20 @@
+extends layout
+
+block content
+
+  h1 Item: #{item.name}
+  p #{item.description}
+  
+  p #[strong Brand:]  #{item.brand.name}
+  p #[strong Category:] #{item.category.name}
+  p #[strong Status:] 
+    if item.status=='Available'
+        span.text-success #{item.status}
+    else if item.status=='Sold out'
+        span.text-danger #{item.status}
+    else if item.status=='Coming soon'
+        span.text-info #{item.status}
+    else
+        span.text-warning #{item.status} 
+    if item.status=='Available'
+        span  (Price: $#{item.price} )

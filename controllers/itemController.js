@@ -13,7 +13,14 @@ exports.item_list = function(req, res) {
 
 // Display detail page for a specific Item.
 exports.item_detail = function(req, res) {
-    res.send('NOT IMPLEMENTED: Item detail: ' + req.params.id);
+    Item.findById(req.params.id, 'name description status price')
+    .populate('category', 'name')
+    .populate('brand', 'name')
+    .exec(function (err, item) {
+      if (err) { return next(err); }
+      // Successful, so render
+      res.render('item_detail', {item: item });
+    });
 };
 
 // Display Item create form on GET.
