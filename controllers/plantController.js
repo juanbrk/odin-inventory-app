@@ -1,9 +1,9 @@
 var Plant = require('../models/plant');
 var Seed = require('../models/seed');
-var Plant = require('../models/item');
 var PlantType = require('../models/plant_type');
 
 var async = require('async');
+
 
 exports.index = function(req, res) {   
     
@@ -39,7 +39,13 @@ exports.plant_list = function(req, res) {
 
 // Display detail page for a specific Plant.
 exports.plant_detail = function(req, res) {
-    res.send('NOT IMPLEMENTED: Plant detail: ' + req.params.id);
+    Plant.findById(req.params.id)
+    .populate('plant_type')
+    .exec(function (err, plant) {
+      if (err) { return next(err); }
+      // Successful, so render
+      res.render('plant_detail', {plant: plant });
+    });
 };
 
 // Display Plant create form on GET.

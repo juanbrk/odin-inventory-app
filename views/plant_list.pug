@@ -4,6 +4,7 @@ block content
   h1= title
 
   ul
+    - plant_list.sort(function(a, b) {let plantA = a.name.toUpperCase(); let plantB = b.name.toUpperCase(); return (plantA < plantB) ? -1 : (plantA > plantB) ? 1 : 0;});
     each plant in plant_list
       li 
         a(href=plant.url) #{plant.name} : #{plant.plant_type} - 
@@ -15,8 +16,6 @@ block content
           span.text-info #{plant.status}
         else
           span.text-warning #{plant.status} 
-        if plant.status=='Available'
-          span  (Price: $#{plant.price} )
 
     else
       li There are no plants.

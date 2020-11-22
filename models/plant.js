@@ -1,4 +1,6 @@
 var mongoose = require('mongoose');
+const { DateTime } = require("luxon");
+
 
 var Schema = mongoose.Schema;
 
@@ -20,6 +22,12 @@ PlantSchema
 .virtual('url')
 .get(function () {
   return '/catalog/plant/' + this._id;
+});
+
+PlantSchema
+.virtual('sow_date_formatted')
+.get(function () {
+  return DateTime.fromJSDate(this.date_of_sow).toLocaleString(DateTime.DATE_MED);
 });
 
 //Export model

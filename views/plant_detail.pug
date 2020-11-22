@@ -1,0 +1,22 @@
+extends layout
+
+block content
+
+  h1 Plant: #{plant.name}
+  p.small #{plant.family_name}
+  
+  p #[strong Type:]  #{plant.plant_type.name}
+  p #[strong Date of sow:]  #{plant.sow_date_formatted}
+  p #[strong Status:] 
+    if plant.status=='Available'
+        span.text-success #{plant.status}
+    else if plant.status=='Sold out'
+        span.text-danger #{plant.status}
+    else if plant.status=='Coming soon'
+        span.text-info #{plant.status}
+    else
+        span.text-warning #{plant.status}
+
+  if plant.status=='Available'
+      p #[strong Price:] $#{plant.price}
+      p #[strong Stock:] #{plant.stock}
