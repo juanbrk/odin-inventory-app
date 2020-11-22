@@ -20,7 +20,13 @@ exports.seed_list = function(req, res) {
 
 // Display detail page for a specific Seed.
 exports.seed_detail = function(req, res) {
-    res.send('NOT IMPLEMENTED: Seed detail: ' + req.params.id);
+    Seed.findById(req.params.id)
+    .populate('plant')
+    .exec(function (err, seed) {
+      if (err) { return next(err); }
+      // Successful, so render
+      res.render('seed_detail', {seed: seed });
+    });
 };
 
 // Display Seed create form on GET.
