@@ -12,7 +12,12 @@ exports.plant_type_list = function(req, res) {
 
 // Display detail page for a specific PlantType.
 exports.plant_type_detail = function(req, res) {
-    res.send('NOT IMPLEMENTED: PlantType detail: ' + req.params.id);
+    PlantType.findById(req.params.id)
+    .exec(function (err, plant_type) {
+      if (err) { return next(err); }
+      // Successful, so render
+      res.render('plant_type_detail', {plant_type: plant_type });
+    });
 };
 
 // Display PlantType create form on GET.

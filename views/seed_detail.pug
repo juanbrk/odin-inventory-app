@@ -1,0 +1,14 @@
+extends layout
+
+block content
+
+  h1 Seed: #{seed.name}
+  p.small #{seed.description}
+  
+  p #[strong Brand:] #{seed.brand}
+  p #[strong Price:]  #{seed.formatted_price}
+  p #[strong Expiration date:]  #{seed.expiration_date_formatted}
+
+  if seed.status=='Available'
+      p #[strong Price:] $#{seed.price}
+      p #[strong Stock:] #{seed.stock}
