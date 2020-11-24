@@ -7,7 +7,7 @@ block content
     - plant_list.sort(function(a, b) {let plantA = a.name.toUpperCase(); let plantB = b.name.toUpperCase(); return (plantA < plantB) ? -1 : (plantA > plantB) ? 1 : 0;});
     each plant in plant_list
       li 
-        a(href=plant.url) #{plant.name} : #{plant.plant_type} - 
+        a(href=plant.url) #{plant.name} : #{plant.plant_type.name} - 
         if plant.status=='Available'
           span.text-success #{plant.status}
         else if plant.status=='Sold out'

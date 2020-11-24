@@ -1,0 +1,50 @@
+extends layout
+
+block content
+  h1= title
+
+  form(method='POST' action='')
+    
+    div.form-group
+      label(for='name') Name:
+      textarea#summary.form-control(type='text', placeholder='What\'s the name of the plant?' name='name')
+    div.form-group
+      label(for='plant_type') Plant type:
+      select#title.form-control(type='select', placeholder='Select Plant Type' name='plant_type' required='true' )
+       - plant_types.sort(function(a, b) {let plant_typeA = a.name.toUpperCase(); let plant_typeB = b.name.toUpperCase(); return (plant_typeA < plant_typeB) ? -1 : (plant_typeA > plant_typeB) ? 1 : 0;});
+       for plant_type in plant_types
+            option(value=plant_type._id) #{plant_type.name}
+    div.form-group
+      label(for='family_name') Family Name:
+      textarea#summary.form-control(type='text', placeholder='What\'s the fancy name of the plant?' name='family_name')
+    div.form-group
+      if plant
+        label(for='status') Status:
+        select#status.form-control(type='select' placeholder='Select status' name='status' required='true')
+          option(value='Maintenance' selected=item.status=='Sold out') Sold out
+          option(value='Available' selected=item.status=='Available' ) Available
+          option(value='Loaned' selected=item.status=='Coming soon' ) Coming soon
+          option(value='Reserved' selected=item.status=='Unavailable' ) Unavailable
+      else
+        label(for='status') Status:
+        select#status.form-control(type='select' placeholder='Select status' name='status' required='true')
+          option(value='Maintenance') Sold out
+          option(value='Available' ) Available
+          option(value='Loaned' ) Coming soon
+          option(value='Reserved' ) Unavailable
+    div.form-group
+        label(for='price') PRICE: 
+            input.form-control(type='number' name='price' placeholder='Item price' step='any')
+    div.form-group
+        label(for='stock') Amount in stock:
+            input.form-control(type='number' name='stock' placeholder='Item stock')
+    div.form-group
+      label(for='date_of_sow') Date of Sow:
+      input#due_back.form-control(type='date' name='date_of_sow' value=(undefined===plant ? '' : plant.date_of_sow) )
+
+    button.btn.btn-primary(type='submit') Submit
+
+  if errors 
+    ul
+      for error in errors
+        li!= error.param + (' ') +  error.msg

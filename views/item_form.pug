@@ -1,0 +1,53 @@
+extends layout
+
+block content
+  h1= title
+
+  form(method='POST' action='')
+    
+    div.form-group
+      label(for='name') Name:
+      textarea#summary.form-control(type='text', placeholder='What\'s the name of the item' name='name')
+    div.form-group
+      label(for='brand') Brand:
+      select#title.form-control(type='select', placeholder='Select brand' name='brand' required='true' )
+       - brands.sort(function(a, b) {let brandA = a.name.toUpperCase(); let brandB = b.name.toUpperCase(); return (brandA < brandB) ? -1 : (brandA > brandB) ? 1 : 0;});
+       for brand in brands
+            option(value=brand._id) #{brand.name}
+    div.form-group
+      label(for='description') Description:
+      textarea#summary.form-control(type='textarea', placeholder='Description (Max 250 characters)' name='description')
+    div.form-group
+      label(for='category') Category:
+      select#author.form-control(type='select' placeholder='Select category' name='category' required='true' )
+        - categories.sort(function(a, b) {let categoryA = a.name.toUpperCase(); let categoryB = b.name.toUpperCase(); return (categoryA < categoryB) ? -1 : (categoryA > categoryB) ? 1 : 0;});
+        for category in categories
+            option(value=category._id) #{category.name}
+    div.form-group
+      if item
+        label(for='status') Status:
+        select#status.form-control(type='select' placeholder='Select status' name='status' required='true')
+          option(value='Maintenance' selected=item.status=='Sold out') Sold out
+          option(value='Available' selected=item.status=='Available' ) Available
+          option(value='Loaned' selected=item.status=='Coming soon' ) Coming soon
+          option(value='Reserved' selected=item.status=='Unavailable' ) Unavailable
+      else
+        label(for='status') Status:
+        select#status.form-control(type='select' placeholder='Select status' name='status' required='true')
+          option(value='Maintenance') Sold out
+          option(value='Available' ) Available
+          option(value='Loaned' ) Coming soon
+          option(value='Reserved' ) Unavailable
+    div.form-group
+        label(for='price') PRICE: 
+            input.form-control(type='number' name='price' placeholder='Item price' step='any')
+    div.form-group
+        label(for='stock') Amount in stock:
+            input.form-control(type='number' name='stock' placeholder='Item stock')
+
+    button.btn.btn-primary(type='submit') Submit
+
+  if errors 
+    ul
+      for error in errors
+        li!= error.param + (' ') +  error.msg

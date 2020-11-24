@@ -6,7 +6,8 @@ var CategorySchema = new Schema(
   {
     name: {type: String, required: true, maxlength: 100},
     description: {type: String, maxlength:250}
-  }
+  }, 
+  { collection: 'categories' }
 );
 
 

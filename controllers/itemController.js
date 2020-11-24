@@ -1,4 +1,9 @@
 var Item = require('../models/item');
+var Brand = require('../models/brand');
+var Category = require('../models/category');
+
+const async = require('async');
+const { body,validationResult } = require('express-validator');
 
 // Display list of all Items.
 exports.item_list = function(req, res) {
@@ -25,13 +30,75 @@ exports.item_detail = function(req, res) {
 
 // Display Item create form on GET.
 exports.item_create_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Item create GET');
+    // Get all brands and brands, which we can use for adding to our seed.
+    async.parallel({
+        brands: function(callback) {
+            Brand.find({}, 'name', callback);
+        },
+        categories: function(callback) {
+            Category.find({}, 'name', callback);
+        },
+    }, function(err, results) {
+        if (err) { return next(err); }
+        console.log(`RESULTS %o`, results);
+        res.render('item_form', { title: 'New Item', brands: results.brands, categories: results.categories });
+    });
 };
 
 // Handle Item create on POST.
-exports.item_create_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Item create POST');
-};
+exports.item_create_post = [
+    // Validate and sanitise fields.
+    body('name', 'Name not specified').trim().isLength({ min: 1 }).escape(),
+    body('status', 'Status not selected').trim().isLength({ min: 1 }).escape(),
+    body('category', 'Category not selected').trim().isLength({ min: 1 }).escape(),
+    body('brand', 'select brand').trim().isLength({ min: 1 }).escape(),
+    body('description', ).optional().trim().escape(),
+    body('price').isCurrency().optional().escape(),
+    body('stock', 'Invalid stock').optional({ checkFalsy: true }).escape(),
+    
+    // Process request after validation and sanitization.
+    (req, res, next) => {
+
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // Create a Item object with escaped and trimmed data.
+        var item = new Item(
+          { name: req.body.name,
+            brand: req.body.brand,
+            description: req.body.description,
+            stock: req.body.stock,
+            category: req.body.category,
+            status: req.body.status,
+            price: req.body.price,
+           });
+
+        if (!errors.isEmpty()) {
+            // There are errors. Render form again with sanitized values and error messages.
+            async.parallel({
+                brands: function(callback) {
+                    Brand.find({}, 'name', callback);
+                },
+                categories: function(callback) {
+                    Category.find({}, 'name', callback);
+                },
+            }, function (err, results) {
+                    if (err) { return next(err); }
+                    // Successful, so render.
+                    res.render('item_form', { title: 'New Item', brands: results.brands, categories: results.categories, errors: errors.array() });
+            });
+            return;
+        }
+        else {
+            // Data from form is valid.
+            item.save(function (err) {
+                if (err) { return next(err); }
+                   // Successful - redirect to new record.
+                   res.redirect(item.url);
+                });
+        }
+    }
+];
 
 // Display Item delete form on GET.
 exports.item_delete_get = function(req, res) {
