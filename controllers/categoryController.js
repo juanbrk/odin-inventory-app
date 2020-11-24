@@ -1,5 +1,5 @@
 var Category = require('../models/category');
-var Item = require('../models/item');
+var Item = require('../models/category');
 
 const async = require('async');
 const { body,validationResult } = require("express-validator");
@@ -102,10 +102,52 @@ exports.category_delete_post = function(req, res) {
 
 // Display Category update form on GET.
 exports.category_update_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Category update GET');
+  Category.findById(req.params.id)
+  .exec(function (err, category) {
+      if (err) { return next(err); }
+      if (category==null) { // No results.
+          var err = new Error('Category not found');
+          err.status = 404;
+          return next(err);
+      }
+      // Successful, so render.
+      res.render('category_form', { title: 'Update Category: '+ category.name, category: category });
+  })
 };
 
 // Handle Category update on POST.
-exports.category_update_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Category update POST');
-};
+exports.category_update_post = [
+  // Validate and santise the name field.
+  body('name', 'Category name required').trim().isLength({ min: 1 }).escape(),
+  body('description', 'Description is not correct' ).optional().trim().escape(),
+
+  (req, res, next) => {
+    
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    // Create a category object with escaped and trimmed data.
+    var category = new Category(
+      { 
+          name: req.body.name,
+          description: req.body.description
+      }
+    );
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render the form again with sanitized values/error messages.
+      res.render('category_form', { title: 'Update Category: ' + category.name, category: category, errors: errors.array()});
+      return;
+    }
+    else {
+      // Data from form is valid. Update the record.
+      category._id = req.params.id //This is required, or a new ID will be assigned!
+
+      Category.findByIdAndUpdate(req.params.id, category, {}, function (err,theCategory) {
+        if (err) { return next(err); }
+        // Successful - redirect to book detail page.
+        res.redirect(theCategory.url);
+      });
+    }
+  }
+];

@@ -34,16 +34,16 @@ block content
       label(for='status') Status:
       if item
         select#status.form-control(type='select' placeholder='Select status' name='status' required='true')
-          option(value='Maintenance' selected=item.status=='Sold out') Sold out
+          option(value='Sold out' selected=item.status=='Sold out') Sold out
           option(value='Available' selected=item.status=='Available' ) Available
-          option(value='Loaned' selected=item.status=='Coming soon' ) Coming soon
-          option(value='Reserved' selected=item.status=='Unavailable' ) Unavailable
+          option(value='Coming soon' selected=item.status=='Coming soon' ) Coming soon
+          option(value='Unavailable' selected=item.status=='Unavailable' ) Unavailable
       else
         select#status.form-control(type='select' placeholder='Select status' name='status' required='true')
-          option(value='Maintenance') Sold out
+          option(value='Sold out') Sold out
           option(value='Available' ) Available
-          option(value='Loaned' ) Coming soon
-          option(value='Reserved' ) Unavailable
+          option(value='Coming soon' ) Coming soon
+          option(value='Unavailable' ) Unavailable
     div.form-group
       label(for='category') Category:
       select#author.form-control(type='select' placeholder='Select category' name='category' required='true' )
