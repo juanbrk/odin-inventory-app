@@ -18,3 +18,8 @@ block content
         span.text-warning #{item.status} 
     if item.status=='Available'
         span  (Price: $#{item.price} )
+  hr
+  p
+    a(href=item.url+'/delete') Delete Item
+  p
+    a(href=item.url+'/update') Update Item
