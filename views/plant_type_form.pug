@@ -9,7 +9,11 @@ block content
       input#name.form-control(type='text', placeholder='Herb, Interior, etc.' name='name' value=(undefined===plant_type ? '' : plant_type.name))
     div.form-group
       label(for='description') Description:
-      textarea#summary.form-control(type='textarea', placeholder='Description (Max 250 characters)' name='description')
+      textarea#summary.form-control(
+        type='textarea' 
+        placeholder='Description (Max 250 characters)' 
+        name='description'
+      ) #{(undefined===plant_type ? '' : plant_type.description)} 
     button.btn.btn-primary(type='submit') Submit
 
   if errors 

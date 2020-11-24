@@ -90,10 +90,53 @@ exports.plant_type_delete_post = function(req, res) {
 
 // Display PlantType update form on GET.
 exports.plant_type_update_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: PlantType update GET');
+  PlantType.findById(req.params.id)
+  .exec(function (err, plant_type) {
+      if (err) { return next(err); }
+      if (plant_type==null) { // No results.
+          var err = new Error('Plant Type not found');
+          err.status = 404;
+          return next(err);
+      }
+      // Successful, so render.
+      res.render('plant_type_form', { title: 'Update Plant Type: '+ plant_type.name, plant_type: plant_type });
+  })
 };
 
 // Handle PlantType update on POST.
-exports.plant_type_update_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: PlantType update POST');
-};
+exports.plant_type_update_post =  [
+  // Validate and santise the name field.
+  body('name', 'Plant Type name required').trim().isLength({ min: 1 }).escape(),
+  body('description', 'Description is not correct' ).optional().trim().escape(),
+
+
+  (req, res, next) => {
+    
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    // Create a plant_type object with escaped and trimmed data.
+    var plant_type = new PlantType(
+      {
+        name: req.body.name,
+        description: req.body.description
+      }
+    );
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render the form again with sanitized values/error messages.
+      res.render('plant_type_form', { title: 'Update Plant Type: ' + plant_type.name, plant_type: plant_type, errors: errors.array()});
+      return;
+    }
+    else {
+      // Data from form is valid. Update the record.
+      plant_type._id = req.params.id //This is required, or a new ID will be assigned!
+
+      PlantType.findByIdAndUpdate(req.params.id, plant_type, {}, function (err,thePlantType) {
+        if (err) { return next(err); }
+        // Successful - redirect to book detail page.
+        res.redirect(thePlantType.url);
+      });
+    }
+  }
+];

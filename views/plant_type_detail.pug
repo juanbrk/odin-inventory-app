@@ -4,3 +4,9 @@ block content
 
   h1 Plant Type: #{plant_type.name}
   p.small #{plant_type.description}
+
+  hr
+  p
+    a(href=plant_type.url+'/delete') Delete Plant Type
+  p
+    a(href=plant_type.url+'/update') Update Plant Type
