@@ -18,5 +18,12 @@ block content
         span.text-warning #{plant.status}
 
   if plant.status=='Available'
-      p #[strong Price:] $#{plant.price}
+      p #[strong Price:] $#{plant.formatted_price}
       p #[strong Stock:] #{plant.stock}
+  
+  hr
+  p
+    a(href=plant.url+'/delete') Delete Plant
+  p
+    a(href=plant.url+'/update') Update Plant
+

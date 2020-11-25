@@ -128,10 +128,77 @@ exports.plant_delete_post = function(req, res) {
 
 // Display Plant update form on GET.
 exports.plant_update_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Plant update GET');
+    async.parallel({
+        plant: function(callback){
+            Plant.findById(req.params.id)
+            .populate('plant_type')
+            .exec(callback);
+        },
+        plant_types: function(callback) {
+            PlantType.find({}, 'name', callback);
+        },
+    }, function(err, results) {
+        if (err) { return next(err); }
+        if (results.plant==null) { // No results.
+            var err = new Error('Plant not found');
+            err.status = 404;
+            return next(err);
+        }
+        res.render('plant_form', { title: 'Update Plant', plant_types: results.plant_types, plant:results.plant });
+    });
 };
 
 // Handle Plant update on POST.
-exports.plant_update_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Plant update POST');
-};
+exports.plant_update_post = [
+   
+    // Validate and sanitise fields.
+    body('name', 'Name not specified').trim().isLength({ min: 1 }).escape(),
+    body('status', 'Status not selected').trim().isIn(['Available', 'Sold out', 'Coming soon','Unavailable']).isLength({ min: 1 }).escape(),
+    body('plant_type', 'Plant Type not selected').trim().isLength({ min: 1 }).escape(),
+    body('stock', 'Invalid stock').trim().optional().isNumeric().escape(),
+    body('date_of_sow','Invalid date of sow' ).optional({ checkFalsy: true }).isISO8601().toDate(),
+    body('price').isCurrency().isNumeric().optional().escape(),
+    body('family_name', 'Invalid family name').optional({ checkFalsy: true }).trim().isLength({ min: 1 }).escape(),
+    
+    // Process request after validation and sanitization.
+    (req, res, next) => {
+
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+        
+        // Create a Plant object with escaped and trimmed data.
+        var plant = new Plant(
+            { name: req.body.name,
+              status: req.body.status,
+              plant_type: req.body.plant_type,
+              stock: req.body.stock,
+              date_of_sow: req.body.date_of_sow,
+              price: req.body.price,
+              family_name: req.body.family_name
+             });
+
+        if (!errors.isEmpty()) {
+            // There are errors. Render form again with sanitized values and error messages.
+            async.parallel({
+                plant_types: function(callback) {
+                    PlantType.find({}, 'name', callback);
+                },
+            }, function (err, results) {
+                    if (err) { return next(err); }
+                    // Successful, so render.
+                    res.render('plant_form', { title: 'New Plant', plant_types: results.plant_types, plant: plant, errors: errors.array() });
+            });
+            return;
+        }
+        else {
+            
+            // Data from form is valid. Update the record.
+            plant._id=req.params.id //This is required, or a new ID will be assigned!
+            Plant.findByIdAndUpdate(req.params.id, plant, {}, function (err,theplant) {
+                if (err) { return next(err); }
+                   // Successful - redirect to book detail page.
+                   res.redirect(theplant.url);
+                });
+        }
+    }
+];

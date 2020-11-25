@@ -7,43 +7,74 @@ block content
     
     div.form-group
       label(for='name') Name:
-      textarea#summary.form-control(type='text', placeholder='What\'s the name of the item' name='name')
+      input#name.form-control(type='text', placeholder='What\'s the name of the item' name='name' value=(undefined===item ? '' : item.name))
+    div.form-group
+      label(for='description') Description:
+      textarea#summary.form-control(
+        type='textarea'
+        placeholder='Description (Max 250 characters)' 
+        name='description' ) #{(undefined==item ? '' : item.description)}
     div.form-group
       label(for='brand') Brand:
       select#title.form-control(type='select', placeholder='Select brand' name='brand' required='true' )
-       - brands.sort(function(a, b) {let brandA = a.name.toUpperCase(); let brandB = b.name.toUpperCase(); return (brandA < brandB) ? -1 : (brandA > brandB) ? 1 : 0;});
-       for brand in brands
-            option(value=brand._id) #{brand.name}
+        - brands.sort(function(a, b) {let brandA = a.name.toUpperCase(); let brandB = b.name.toUpperCase(); return (brandA < brandB) ? -1 : (brandA > brandB) ? 1 : 0;});
+        for brand in brands
+          if item
+            //- Handle GET form, where book.author is an object, and POST form, where it is a string.
+            option(
+              value=brand._id
+              selected=(
+                brand._id.toString()==item.brand._id
+                || brand._id.toString()==item.brand
+              ) ? 'selected' : false
+            ) #{brand.name}
+          else
+            option(value=brand._id) #{brand.name}  
     div.form-group
-      label(for='description') Description:
-      textarea#summary.form-control(type='textarea', placeholder='Description (Max 250 characters)' name='description')
+      label(for='status') Status:
+      if item
+        select#status.form-control(type='select' placeholder='Select status' name='status' required='true')
+          option(value='Sold out' selected=item.status=='Sold out') Sold out
+          option(value='Available' selected=item.status=='Available' ) Available
+          option(value='Coming soon' selected=item.status=='Coming soon' ) Coming soon
+          option(value='Unavailable' selected=item.status=='Unavailable' ) Unavailable
+      else
+        select#status.form-control(type='select' placeholder='Select status' name='status' required='true')
+          option(value='Sold out') Sold out
+          option(value='Available' ) Available
+          option(value='Coming soon' ) Coming soon
+          option(value='Unavailable' ) Unavailable
     div.form-group
       label(for='category') Category:
       select#author.form-control(type='select' placeholder='Select category' name='category' required='true' )
         - categories.sort(function(a, b) {let categoryA = a.name.toUpperCase(); let categoryB = b.name.toUpperCase(); return (categoryA < categoryB) ? -1 : (categoryA > categoryB) ? 1 : 0;});
         for category in categories
+          if item
+            //- Handle GET form, where book.author is an object, and POST form, where it is a string.
+            option(
+              value=category._id
+              selected=(
+                category.name.toString()==item.category.name)
+              ) #{category.name}
+          else
             option(value=category._id) #{category.name}
-    div.form-group
       if item
-        label(for='status') Status:
-        select#status.form-control(type='select' placeholder='Select status' name='status' required='true')
-          option(value='Maintenance' selected=item.status=='Sold out') Sold out
-          option(value='Available' selected=item.status=='Available' ) Available
-          option(value='Loaned' selected=item.status=='Coming soon' ) Coming soon
-          option(value='Reserved' selected=item.status=='Unavailable' ) Unavailable
-      else
-        label(for='status') Status:
-        select#status.form-control(type='select' placeholder='Select status' name='status' required='true')
-          option(value='Maintenance') Sold out
-          option(value='Available' ) Available
-          option(value='Loaned' ) Coming soon
-          option(value='Reserved' ) Unavailable
     div.form-group
         label(for='price') PRICE: 
-            input.form-control(type='number' name='price' placeholder='Item price' step='any')
+            input.form-control(type='number' 
+              name='price' 
+              placeholder='Item price' 
+              step='any'
+              value=(undefined===item ? '' : item.formatted_price)
+            )
     div.form-group
         label(for='stock') Amount in stock:
-            input.form-control(type='number' name='stock' placeholder='Item stock')
+            input.form-control(
+              type='number' 
+              name='stock' 
+              placeholder='Item stock'
+              value=(undefined===item ? '' : item.stock)
+            )
 
     button.btn.btn-primary(type='submit') Submit
 

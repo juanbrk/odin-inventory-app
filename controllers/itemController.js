@@ -112,10 +112,85 @@ exports.item_delete_post = function(req, res) {
 
 // Display Item update form on GET.
 exports.item_update_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Item update GET');
+    // Get brand, and categories for form.
+    async.parallel({
+        item: function(callback){
+            Item.findById(req.params.id)
+            .populate('category')
+            .populate('brand')
+            .exec(callback);
+        },
+        brands: function(callback) {
+            Brand.find({}, 'name', callback);
+        },
+        categories: function(callback) {
+            Category.find({}, 'name', callback);
+        },
+    }, function(err, results) {
+            if (err) { return next(err); }
+            if (results.item==null) { // No results.
+                var err = new Error('Item not found');
+                err.status = 404;
+                return next(err);
+            }
+            // Success.
+            res.render('item_form', { title: 'Update Item', categories: results.categories, brands: results.brands, item: results.item });
+        });
 };
 
 // Handle Item update on POST.
-exports.item_update_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Item update POST');
-};
+exports.item_update_post = [
+   
+    // Validate and sanitise fields.
+    body('name', 'Name not specified').trim().isLength({ min: 1 }).escape(),
+    body('status', 'Status not selected').trim().isLength({ min: 1 }).escape(),
+    body('category', 'Category not selected').trim().isLength({ min: 1 }).escape(),
+    body('brand', 'select brand').trim().isLength({ min: 1 }).escape(),
+    body('description', ).optional().trim().escape(),
+    body('price').isCurrency().optional().escape(),
+    body('stock', 'Invalid stock').optional({ checkFalsy: true }).escape(),
+    
+    // Process request after validation and sanitization.
+    (req, res, next) => {
+
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // Create a Book object with escaped/trimmed data and old id.
+        var item = new Item(
+            { name: req.body.name,
+              brand: req.body.brand,
+              description: req.body.description,
+              stock: req.body.stock,
+              category: req.body.category,
+              status: req.body.status,
+              price: req.body.price,
+              _id:req.params.id //This is required, or a new ID will be assigned!
+             });
+
+        if (!errors.isEmpty()) {
+            // There are errors. Render form again with sanitized values/error messages.
+            async.parallel({
+                brands: function(callback) {
+                    Brand.find({}, 'name', callback);
+                },
+                categories: function(callback) {
+                    Category.find({}, 'name', callback);
+                },
+            }, function (err, results) {
+                    if (err) { return next(err); }
+                    // Successful, so render.
+                    res.render('item_form', { title: 'New Item', brands: results.brands, categories: results.categories, errors: errors.array() });
+            });
+            return;
+        }
+        else {
+            // Data from form is valid. Update the record.
+            Item.findByIdAndUpdate(req.params.id, item, {}, function (err,theitem) {
+                if (err) { return next(err); }
+                   // Successful - redirect to book detail page.
+                   res.redirect(theitem.url);
+                });
+        }
+    }
+];
