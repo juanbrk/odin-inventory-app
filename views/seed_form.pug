@@ -9,22 +9,50 @@ block content
       select#title.form-control(type='select', placeholder='Select plant' name='plant' required='true' )
        - plants.sort(function(a, b) {let plantA = a.name.toUpperCase(); let plantB = b.name.toUpperCase(); return (plantA < plantB) ? -1 : (plantA > plantB) ? 1 : 0;});
        for plant in plants
+         if seed
+           //- Handle GET form and POST form, where it is a string.
+           option(
+             value=plant._id
+             selected=(plant.name.toString()==seed.plant.name)
+           ) #{plant.name}
+         else
             option(value=plant._id) #{plant.name}
     div.form-group
       label(for='brand') Brand:
       select#author.form-control(type='select' placeholder='Select brand' name='brand' required='true' )
         - brands.sort(function(a, b) {let brandA = a.name.toUpperCase(); let brandB = b.name.toUpperCase(); return (brandA < brandB) ? -1 : (brandA > brandB) ? 1 : 0;});
         for brand in brands
+          if seed
+            //- Handle GET form and POST form, where it is a string.
+            option(
+              value=brand._id
+              selected=(brand.name.toString()==seed.brand.name)
+            ) #{brand.name}
+          else
             option(value=brand._id) #{brand.name}
     div.form-group
       label(for='description') Description:
-      textarea#summary.form-control(type='textarea', placeholder='Description (Max 250 characters)' name='description')
+      textarea#summary.form-control(
+        type='textarea' 
+        placeholder='Description (Max 250 characters)' 
+        name='description'
+      ) #{(undefined===seed ? '': seed.description )}
     div.form-group
         label(for='price') PRICE:
-            input.form-control(type='number' name='price' placeholder='Seed price')
+            input.form-control(
+              type='number' 
+              name='price' 
+              placeholder='Seed price'
+              step='any'
+              value=(undefined===seed ? '' : seed.price)
+            )
     div.form-group
       label(for='exp_date') expiration-date:
-      input#due_back.form-control(type='date' name='exp_date' value=(undefined===seed ? '' : seed.expiration_date) )
+      input#due_back.form-control(
+        type='date' 
+        name='exp_date' 
+        value=(undefined===seed ? '' : seed.expiration_date) 
+      )
 
     button.btn.btn-primary(type='submit') Submit
 
