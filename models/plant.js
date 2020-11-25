@@ -30,5 +30,11 @@ PlantSchema
   return DateTime.fromJSDate(this.date_of_sow).toLocaleString(DateTime.DATE_MED);
 });
 
+PlantSchema
+.virtual('formatted_price')
+.get(function () {
+  return this.price == undefined ? "" : this.price.toFixed(2);
+});
+
 //Export model
 module.exports = mongoose.model('Plant', PlantSchema);
