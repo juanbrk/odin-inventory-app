@@ -2,9 +2,12 @@ extends layout
 
 block content
   h1= title
+
+  if user
+    p Welcome back #{user.username}
+  
   p Welcome to #[em Plant inventory management app], a very basic Express website to control plant and items inventory.
 
-  h1 Dynamic content
 
   if error
     p Error getting dynamic content.

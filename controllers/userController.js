@@ -38,3 +38,14 @@ exports.sign_up_post =[
     }
 ] 
 
+exports.log_in_get = (req, res) => res.render("log_in_form");
+
+exports.get_log_out = (req, res) => {
+    req.logout();
+    res.redirect("/");
+  }
+
+
+
+
+
