@@ -24,7 +24,8 @@ exports.index = function(req, res) {
         }
 
     }, function(err, results) {
-        res.render('index', { title: 'Plant inventory Home', error: err, data: results });
+        const user = undefined===req.user ? undefined : req.user;
+        res.render('index', { title: 'Plant inventory Home', error: err, data: results, user: user });
     });
 };
 
