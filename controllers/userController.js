@@ -1,6 +1,7 @@
 var User = require('../models/user');
 
 const { body,validationResult } = require("express-validator");
+const bcrypt = require('bcryptjs');
 
 exports.sign_up_get = (req, res) => res.render("sign_up_form");
 
@@ -27,16 +28,23 @@ exports.sign_up_post =[
             .exec( function(err, found_user) {
                 if (err || found_user) { return next(err); }
                 else {
-                    user.save(function (err) {
+                    bcrypt.hash( user.password, 10, (err, hashedPassword) => {
+                        // if err, do something
                         if (err) { return next(err); }
-                        // Category saved. Redirect to category detail page.
-                        res.redirect("/");
+                        // otherwise, store hashedPassword in DB
+                        user.password = hashedPassword;
+                        user.save(function (err) {
+                            if (err) { return next(err); }
+                            // User saved. 
+                            res.redirect("/");
+                        });
                     });
                 }  
             });
         }
     }
 ] 
+
 
 exports.log_in_get = (req, res) => res.render("log_in_form");
 

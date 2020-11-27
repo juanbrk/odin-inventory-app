@@ -6,9 +6,9 @@ var logger = require('morgan');
 
 // LO DE ABAJO NO ESTARÁ POR SIEMPRE AQUI ------------------------------
 var User = require('./models/user');
-// LO DE ARRIBA NO ESTARÁ POR SIEMPRE AQUI ------------------------------
 
-// LO DE ABAJO NO ESTARÁ POR SIEMPRE AQUI ------------------------------
+const bcrypt = require('bcryptjs');
+
 const session = require("express-session");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
@@ -42,12 +42,18 @@ passport.use(
         return done(err);
       };
       if (!user) {
-        return done(null, false, { msg: "Incorrect username" });
+        done(err);
       }
-      if (user.password !== password) {
-        return done(null, false, { msg: "Incorrect password" });
-      }
-      return done(null, user);
+
+      bcrypt.compare(password, user.password, (err, isMatch) => {
+        if(err) return done(err);
+        if (!isMatch) {
+          return done(null, false, { message: { password: 'Incorrect password' } });
+        } else{
+          // passwords match! log user in
+          return done(null, user)
+        }
+      })
     });
   })
 );
