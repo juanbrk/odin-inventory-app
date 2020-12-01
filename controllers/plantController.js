@@ -3,6 +3,8 @@ var Seed = require('../models/seed');
 var Item = require('../models/item');
 var PlantType = require('../models/plant_type');
 
+const jwt = require('jsonwebtoken');
+
 var async = require('async');
 const { body,validationResult } = require('express-validator');
 
@@ -54,15 +56,27 @@ exports.plant_detail = function(req, res) {
 
 // Display Plant create form on GET.
 exports.plant_create_get = function(req, res) {
-    // Get all  plant types which we can use for adding to our plant.
-    async.parallel({
-        plant_types: function(callback) {
-            PlantType.find({}, 'name', callback);
-        },
-    }, function(err, results) {
-        if (err) { return next(err); }
-        res.render('plant_form', { title: 'New Plant', plant_types: results.plant_types });
-    });
+    //auth
+    jwt.verify(req.token, 'cucurucho', (err, authData, next) =>{
+        if (err) {
+            res.sendStatus(403);
+        } else {
+            console.log(`SUCCESS`);
+            next();
+        }
+    }),
+    function(req, res){
+        // Get all  plant types which we can use for adding to our plant.
+        async.parallel({
+            plant_types: function(callback) {
+                PlantType.find({}, 'name', callback);
+            },
+        }, function(err, results) {
+            if (err) { return next(err); }
+            res.render('plant_form', { title: 'New Plant', plant_types: results.plant_types });
+        });
+    }
+
 };
 
 // Handle Plant create on POST.

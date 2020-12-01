@@ -2,7 +2,7 @@ extends layout
 
 block content
   h1 Log in
-  form(action="/log-in" method="POST")
+  form(action="/auth/log-in" method="POST")
     div.form-group
       label(for='username') Username:
       input.form-control(

@@ -9,6 +9,24 @@ var plant_type_controller = require('../controllers/plantTypeController');
 var item_controller = require('../controllers/itemController');
 var seed_controller = require('../controllers/seedController');
 
+const passport = require("passport");
+
+// verify token mware for protected routes 
+function verifyToken(req, res, next){
+    //get header value
+    const bearerHeader = req.headers['authorization'];
+
+    if (typeof bearerHeader !== 'undefined'){
+        const bearerToken = bearerHeader.split(' ' )[1];
+        //set the token
+        req.token = bearerToken;
+        //next middleware
+        next();
+    } else {
+        //forbidden
+        res.sendStatus(403);
+    }
+}
 
 // GET catalog home page.
 router.get('/', plant_controller.index);
@@ -16,7 +34,7 @@ router.get('/', plant_controller.index);
 /// PLANT ROUTES ///
 
 // GET request for creating a Plant. NOTE This must come before routes that display Plant (uses id).
-router.get('/plant/create', plant_controller.plant_create_get);
+router.get('/plant/create', verifyToken, plant_controller.plant_create_get);
 
 // POST request for creating Plant.
 router.post('/plant/create', plant_controller.plant_create_post);
